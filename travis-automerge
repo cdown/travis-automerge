@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 : "${BRANCHES_TO_MERGE_REGEX?}" "${BRANCH_TO_MERGE_INTO?}"
-: "${GITHUB_SECRET_TOKEN?}" "${GITHUB_REPO?}"
+: "${GITHUB_REPO?}"
 
 export GIT_COMMITTER_EMAIL='travis@travis'
 export GIT_COMMITTER_NAME='Travis CI'
@@ -14,7 +14,7 @@ fi
 
 # Since Travis does a partial checkout, we need to get the whole thing
 repo_temp=$(mktemp -d)
-git clone "https://$GITHUB_SECRET_TOKEN@github.com/$GITHUB_REPO" "$repo_temp"
+git clone git@github.com:$GITHUB_REPO.git "$repo_temp"
 
 # shellcheck disable=SC2164
 cd "$repo_temp"
@@ -27,7 +27,7 @@ git merge --ff-only "$TRAVIS_COMMIT"
 
 printf 'Pushing to %s\n' "$GITHUB_REPO" >&2
 
-push_uri="https://$GITHUB_SECRET_TOKEN@github.com/$GITHUB_REPO"
+push_uri="git@github.com:$GITHUB_REPO.git"
 
 # Redirect to /dev/null to avoid secret leakage
 git push "$push_uri" "$BRANCH_TO_MERGE_INTO" >/dev/null 2>&1
